@@ -33,11 +33,11 @@ public class AddNewMessage extends HttpServlet {
 		String senderDeviceID = request.getParameter("senderDeviceID");
 		String recepientUserName = request.getParameter("recepientUserName");
 		String message = request.getParameter("message");
-		//String time = request.getParameter("time");
+		String timestamp = request.getParameter("timestamp");
 		
 		String senderUserName = DBConnection.getUserName(senderDeviceID);
 		String recepientRegID = DBConnection.getRegisterationID(recepientUserName);
-		DBConnection.insertMessageIntoDB(senderUserName, recepientRegID, message);
+		DBConnection.insertMessageIntoDB(senderUserName, recepientUserName, recepientRegID, message, timestamp);
 	}
 
 	/**

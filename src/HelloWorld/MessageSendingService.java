@@ -1,5 +1,8 @@
 package HelloWorld;
 
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,18 +35,35 @@ public class MessageSendingService extends Thread {
 			int i = 0;
 			messages = DBConnection.selectMessagesToSend();
 			Message message = new Message();
+			Date dateOfMessage = new Date();
+			Date dateCurrent = new Date();
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-hh:mm:ss");
+			int messageTimeComparedToNow = 1;
 			messagesSelected = false;
 
-			while(i < messages.size())
+			if(messages.isEmpty() == false)
 			{
-				message = messages.get(i);
-				//sendMessageInBackground sender = new sendMessageInBackground(message);
-				//sender.start();
-				SendToGCM.sendMessageUsingRegID(message.getMessageSenderUserName(), message.getMessageRecepientRegID(), message.getMessageContent());
-				message.setAsSent();
-				messages.set(i, message);
 				messagesSelected = true;
-				i++;
+				while(i < messages.size())
+				{
+					message = messages.get(i);
+					//sendMessageInBackground sender = new sendMessageInBackground(message);
+					//sender.start();
+					try {
+						dateOfMessage = simpleDateFormat.parse(message.getTimestamp());
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					messageTimeComparedToNow = dateOfMessage.compareTo(dateCurrent);
+					if(messageTimeComparedToNow <= 0)
+					{
+						SendToGCM.sendMessage(message.getMessageSenderUserName(), message.getMessageRecepientUserName(), message.getMessageRecepientRegID(), message.getMessageContent(), message.getTimestamp());
+						message.setState(1);
+						messages.set(i, message);
+					}
+					i++;
+				}
 			}
 			//Update messages' state in DB to prevent re-sending messages which were sent
 			if(messagesSelected == true)
@@ -66,7 +86,7 @@ public class MessageSendingService extends Thread {
 		{
 			//Send message in background here (just call SendToGCM.sendMessage() here,
 			//using the message passed
-			SendToGCM.sendMessageUsingRegID(message.getMessageSenderUserName(), message.getMessageRecepientRegID(), message.getMessageContent());
+			//SendToGCM.sendMessageUsingRegID(message.getMessageSenderUserName(), message.getMessageRecepientRegID(), message.getMessageContent());
 			System.out.println("Message sent!");
 			//Set message as sent
 		}

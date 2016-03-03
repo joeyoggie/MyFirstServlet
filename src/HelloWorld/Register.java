@@ -51,11 +51,11 @@ public class Register extends HttpServlet {
 		
 		if(inserted == true)
 		{
-			out.println("User " +receivedName+ " info inserted!");
+			out.println("User " +receivedName+ " info registered successfully!");
 		}
 		else
 		{
-			out.println("User " +receivedName+ " info NOT inserted, phone number already in DB!");
+			out.println("User " +receivedName+ " info not inserted, phone number already registered!");
 		}
 		
 	}
