@@ -41,6 +41,7 @@ public class GetInfo extends HttpServlet {
 		
 		PrintWriter out = response.getWriter();
 		out.println(info);
+		System.out.println(info);
 	}
 
 	/**

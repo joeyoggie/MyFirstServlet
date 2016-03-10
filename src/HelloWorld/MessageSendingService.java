@@ -40,6 +40,7 @@ public class MessageSendingService extends Thread {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-hh:mm:ss");
 			int messageTimeComparedToNow = 1;
 			messagesSelected = false;
+			int response;
 
 			if(messages.isEmpty() == false)
 			{
@@ -58,9 +59,12 @@ public class MessageSendingService extends Thread {
 					messageTimeComparedToNow = dateOfMessage.compareTo(dateCurrent);
 					if(messageTimeComparedToNow <= 0)
 					{
-						SendToGCM.sendMessage(message.getMessageSenderUserName(), message.getMessageRecepientUserName(), message.getMessageRecepientRegID(), message.getMessageContent(), message.getTimestamp());
-						message.setState(1);
-						messages.set(i, message);
+						response = SendToGCM.sendMessage(message.getMessageSenderUserName(), message.getMessageRecepientUserName(), message.getMessageRecepientRegID(), message.getMessageContent(), message.getTimestamp());
+						if(response == 200)
+						{
+							message.setState(1);
+							messages.set(i, message);
+						}
 					}
 					i++;
 				}

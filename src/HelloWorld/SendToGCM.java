@@ -14,9 +14,10 @@ public class SendToGCM {
 
 	}
 	
-	public static void sendMessage(String senderUserName, String recepientUserName, String recepientRegID, String message, String timestamp)
+	public static int sendMessage(String senderUserName, String recepientUserName, String recepientRegID, String message, String timestamp)
 	{
-		System.out.println("Sending to GCM server...");
+		int responseCode = 0;
+		System.out.println("Sending message to GCM server...");
 		//String api_key = "AIzaSyCkArQ7w7kgiLit36nxi394sjvVXDei-Fs";
 		String api_key = "AIzaSyCci78JwoIsYzAPJmXvUihOUxYTObJ2Zh4";
 		
@@ -36,9 +37,9 @@ public class SendToGCM {
 	        out.close();
 	 
 	     // 6. Get the response
-            int responseCode = conn.getResponseCode();
-            System.out.println("\nSending 'POST' request to URL : " + url);
-            System.out.println("Response Code : " + responseCode);
+            responseCode = conn.getResponseCode();
+            //System.out.println("\nSending 'POST' request to URL : " + url);
+            System.out.println("Response Code: " + responseCode);
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(conn.getInputStream()));
@@ -61,6 +62,7 @@ public class SendToGCM {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return responseCode;
 	}
 	public static void sendMessageUsingUserName(String senderUserName, String recepientUserName, String message, String timestamp)
 	{

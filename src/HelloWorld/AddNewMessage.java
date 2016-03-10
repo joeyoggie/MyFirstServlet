@@ -38,6 +38,7 @@ public class AddNewMessage extends HttpServlet {
 		String senderUserName = DBConnection.getUserName(senderDeviceID);
 		String recepientRegID = DBConnection.getRegisterationID(recepientUserName);
 		DBConnection.insertMessageIntoDB(senderUserName, recepientUserName, recepientRegID, message, timestamp);
+		System.out.println("New message inserted into DB.");
 	}
 
 	/**
