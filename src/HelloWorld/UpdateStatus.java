@@ -1,27 +1,24 @@
 package HelloWorld;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import HelloWorld.DBConnection;
 
 /**
- * Servlet implementation class GetInfo
+ * Servlet implementation class UpdateStatus
  */
-//This servlet just returns the user info
-//TODO remove this servlet
-@WebServlet("/GetInfo")
-public class GetInfo extends HttpServlet {
+//This servlet allows users to update their personal status and adds it to the database
+@WebServlet("/UpdateStatus")
+public class UpdateStatus extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GetInfo() {
+    public UpdateStatus() {
         super();
     }
 
@@ -29,16 +26,11 @@ public class GetInfo extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		response.setContentType("text/html;charset=UTF-8");
-
-		String deviceID = request.getParameter("deviceID");
-
-		String info = DBConnection.getInfo(deviceID);
-		
-		PrintWriter out = response.getWriter();
-		out.println(info);
-		System.out.println(info);
+		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		String status = request.getParameter("status");
+		String userName = request.getParameter("userName");
+		int userID = DBConnection.getUserID(userName);
+		DBConnection.updateStatus(userID, status);
 	}
 
 	/**

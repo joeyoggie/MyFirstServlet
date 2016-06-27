@@ -7,21 +7,21 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import HelloWorld.DBConnection;
+
+import com.google.gson.Gson;
 
 /**
- * Servlet implementation class GetInfo
+ * Servlet implementation class GetUserInfo
  */
-//This servlet just returns the user info
-//TODO remove this servlet
-@WebServlet("/GetInfo")
-public class GetInfo extends HttpServlet {
+//This function returns the user info of the requested userName
+@WebServlet("/GetUserInfo")
+public class GetUserInfo extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GetInfo() {
+    public GetUserInfo() {
         super();
     }
 
@@ -29,16 +29,22 @@ public class GetInfo extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		String userName = request.getParameter("userName");
+		System.out.println("Received username: "+userName);
 		
-		response.setContentType("text/html;charset=UTF-8");
-
-		String deviceID = request.getParameter("deviceID");
-
-		String info = DBConnection.getInfo(deviceID);
+		User user = new User();
+		user = DBConnection.getUserInfo(userName);
+		
+		Gson gson = new Gson();
+		
+		String jsonString = gson.toJson(user);
 		
 		PrintWriter out = response.getWriter();
-		out.println(info);
-		System.out.println(info);
+		out.write(jsonString);
+		out.flush();
+		out.close();
+		System.out.println("Sent info: "+jsonString);
 	}
 
 	/**

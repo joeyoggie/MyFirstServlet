@@ -6,6 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+//This class is responsible for selecting unsent messages from the database
+//and then sends them to GCM if they should be sent
+//TODO finish implementing threading here
 public class MessageSendingService extends Thread {
 	
 	public void run() {
@@ -19,18 +22,18 @@ public class MessageSendingService extends Thread {
 		//Loop that will select unsent messages from DB and send them
 		while(MessageSendingServiceOnOff.enabled == true)
 		{			
+			//TODO remove this delay
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			//DBConnection method that will select a message that should be sent
+			//DBConnection method that will select a messages that should be sent
 			//and then send them one by one, each in a seperate thread
-			
-			//DBConnection.selectMessagesToSend();
-			//new sendMessageInBackground(message).start();
+			//messages = DBConnection.selectMessagesToSend(); (done below)
+			//loop through the messages list (done below)
+			//TODO new sendMessageInBackground(messages.get(i)).start();
 			
 			int i = 0;
 			messages = DBConnection.selectMessagesToSend();
@@ -48,12 +51,13 @@ public class MessageSendingService extends Thread {
 				while(i < messages.size())
 				{
 					message = messages.get(i);
+					//TODO Send each message in an individual thread on its own
+					//ie, move this part of the code to the sendMessageInBackground class below
 					//sendMessageInBackground sender = new sendMessageInBackground(message);
 					//sender.start();
 					try {
 						dateOfMessage = simpleDateFormat.parse(message.getTimestamp());
 					} catch (ParseException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					messageTimeComparedToNow = dateOfMessage.compareTo(dateCurrent);
@@ -92,7 +96,7 @@ public class MessageSendingService extends Thread {
 			//using the message passed
 			//SendToGCM.sendMessageUsingRegID(message.getMessageSenderUserName(), message.getMessageRecepientRegID(), message.getMessageContent());
 			System.out.println("Message sent!");
-			//Set message as sent
+			//Set message as sent (code for that above)
 		}
 		
 	}

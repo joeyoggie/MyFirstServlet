@@ -1,6 +1,7 @@
 package HelloWorld;
-import java.io.*;
 import java.util.Scanner;
+
+//This class is used as a normal Java app to start the messaging service
 public class MessageSendingServiceOnOff {
 	
 	public static boolean enabled;
@@ -34,7 +35,6 @@ public class MessageSendingServiceOnOff {
 					Thread.sleep(100);
 					sender.stop();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				*/

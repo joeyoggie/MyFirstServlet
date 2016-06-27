@@ -2,17 +2,7 @@ package HelloWorld;
 
 //Import required java libraries
 import java.io.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
-
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -21,15 +11,13 @@ import javax.servlet.http.HttpServletResponse;
 
 //Extend HttpServlet class
 @WebServlet("/Register")
+//This class is used to add a new user to the database
 public class Register extends HttpServlet {
 	static final long serialVersionUID = 1L;
-
-	private String message;
 
 	public void init() throws ServletException
 	{
 		// Do required initialization
-		message = "Reply from Tomcat server @Joey-PC/MyFirstServlet/HelloWorld";
 	}
 
 	public void doGet(HttpServletRequest request,
@@ -45,21 +33,25 @@ public class Register extends HttpServlet {
 		String receivedDeviceID = request.getParameter("deviceID");
 		String receivedRegID = request.getParameter("regID");
 
-		boolean inserted = DBConnection.insertUserIntoDB(receivedUserName, receivedName, receivedPhoneNumber, receivedDeviceID, receivedRegID);
+		String registrationResponse = DBConnection.insertUserIntoDB(receivedUserName, receivedName, receivedPhoneNumber, receivedDeviceID, receivedRegID);
 		
 		PrintWriter out = response.getWriter();
 		
-		if(inserted == true)
+		if(registrationResponse.equals("success"))
 		{
-			out.println("User " +receivedName+ " info registered successfully!");
-			System.out.println("User " +receivedName+ " info registered successfully!");
+			out.println("Registered successfully!");
+			System.out.println("User " +receivedName+ " registered successfully!");
 		}
-		else
+		else if(registrationResponse.contains("phoneNumber"))
 		{
-			out.println("User " +receivedName+ " info not inserted, phone number already registered!");
-			System.out.println("User " +receivedName+ " info not inserted, phone number already registered!");
+			out.println("Registration failed, phoneNumber "+receivedPhoneNumber+" already registered!");
+			System.out.println("User " +receivedName+ " info not inserted, phoneNumber already registered!");
 		}
-		
+		else if(registrationResponse.contains("userName"))
+		{
+			out.println("Registration failed, userName "+receivedUserName+" already in use. Choose another userName and try again.");
+			System.out.println("User " +receivedName+ " not registered, userName already in use. Choose another userName and try again.");
+		}
 	}
 
 	public void destroy()

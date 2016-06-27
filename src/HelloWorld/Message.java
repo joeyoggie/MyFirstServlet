@@ -1,14 +1,17 @@
 package HelloWorld;
 
+//This class is used to map the attributes of a Message, to be used by the server
+//when sending messages from the database to GCM
 public class Message {
 	
 	private int messageID;
 	private String messageContent;
 	private String messageSenderUserName;
+    private String messageSenderDeviceID;
 	private String messageRecepientUserName;
 	private String messageRecepientRegID;
 	private String timestamp;
-	private int state;
+	private int state; //0 is not sent, 1 is sent
 	
 	public Message()
 	{
@@ -46,6 +49,10 @@ public class Message {
 	{
 		this.messageSenderUserName = senderUserName;
 	}
+	public void setMessageSenderDeviceID(String senderDeviceID)
+    {
+        this.messageSenderDeviceID = senderDeviceID;
+    }
 	public void setMessageRecepientUserName(String recepientUserName)
 	{
 		this.messageRecepientUserName = recepientUserName;
@@ -75,6 +82,10 @@ public class Message {
 	{
 		return this.messageSenderUserName;
 	}
+	public String getMessageSenderDeviceID()
+    {
+        return this.messageSenderDeviceID;
+    }
 	public String getMessageRecepientUserName()
 	{
 		return this.messageRecepientUserName;

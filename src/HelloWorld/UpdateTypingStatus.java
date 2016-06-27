@@ -1,27 +1,25 @@
 package HelloWorld;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import HelloWorld.DBConnection;
 
 /**
- * Servlet implementation class GetInfo
+ * Servlet implementation class UpdateTypingStatus
  */
-//This servlet just returns the user info
-//TODO remove this servlet
-@WebServlet("/GetInfo")
-public class GetInfo extends HttpServlet {
+//This servlet is used to receive the 'typing status' of users
+//and forwards it to GCM to send it to the other conversation party
+@WebServlet("/UpdateTypingStatus")
+public class UpdateTypingStatus extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GetInfo() {
+    public UpdateTypingStatus() {
         super();
     }
 
@@ -29,16 +27,13 @@ public class GetInfo extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		response.setContentType("text/html;charset=UTF-8");
+		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		String typingStatus = request.getParameter("typingStatus");
+		String recepientUserName = request.getParameter("recepientUserName");
+		String senderUserName = request.getParameter("senderUserName");
+		String recepientRegID = DBConnection.getRegisterationID(recepientUserName);
 
-		String deviceID = request.getParameter("deviceID");
-
-		String info = DBConnection.getInfo(deviceID);
-		
-		PrintWriter out = response.getWriter();
-		out.println(info);
-		System.out.println(info);
+		SendToGCM.sendTypingStatus(senderUserName, recepientUserName, recepientRegID, typingStatus);		
 	}
 
 	/**

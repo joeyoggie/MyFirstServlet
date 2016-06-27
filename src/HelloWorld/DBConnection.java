@@ -1,17 +1,21 @@
 package HelloWorld;
 
-import java.math.BigInteger;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+//This class is responsible for handling all the database connections
+//from the application server to the database server
+//TODO implement C3PO connection pooling
 public class DBConnection {
 
-	
-	// JDBC driver name and database URL
+	//JDBC driver name and database URL
 		static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 		static String DB_URL = "jdbc:mysql://localhost/project1";
-	// Database credentials
+	//Database credentials
 		static String USER = "Joey";
 		static String PASS = "abcd1234";
 			
@@ -39,6 +43,207 @@ public class DBConnection {
 		//Testing getInfo method
 		System.out.println(getInfo("8920022041007579187"));
 		*/
+	}
+	
+	public static void OnlineState(int userID, String state , String timestamp)
+    {	 
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+		try {
+			//STEP 2: Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			//STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		
+			prepstmt = conn.prepareStatement("INSERT INTO online_state (state_userID, state, timestamp) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE state=?, timestamp=?");
+			prepstmt.setInt(1, userID);
+			prepstmt.setString(2, state);
+			prepstmt.setString(3, timestamp);
+			prepstmt.setString(4, state);
+			prepstmt.setString(5, timestamp);
+			
+			prepstmt.executeUpdate();
+			prepstmt.close();
+			conn.close();
+			
+	} catch (SQLException se) {
+		// Handle errors for JDBC
+		se.printStackTrace();
+	} catch (Exception e) {
+		// Handle errors for Class.forName
+		e.printStackTrace();
+	} finally {
+		// finally block used to close resources
+		try {
+			if (prepstmt != null)
+				prepstmt.close();
+		} catch (SQLException se2) {
+		} // nothing we can do
+		try {
+			if (conn != null)
+				conn.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} 
+	}
+		
+    }
+	
+	public static void updateStatus(int userID, String status) {
+
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+		try {
+			//STEP 2: Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			//STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			
+			//STEP 4: Execute a query
+			prepstmt = conn.prepareStatement("INSERT INTO status (status_userID, latestStatus) VALUES (?, ?) ON DUPLICATE KEY UPDATE latestStatus=?");
+			prepstmt.setInt(1, userID);
+			prepstmt.setString(2, status);
+			prepstmt.setString(3, status);
+
+			prepstmt.executeUpdate();
+			prepstmt.close();
+						
+			// STEP 6: Clean-up environment
+			conn.close();
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (prepstmt != null)
+					prepstmt.close();
+			} catch (SQLException se2) {
+			} // nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} // end finally try
+		} // end try
+	}
+	
+	
+	public static int getUserID(String userName) {
+
+		int userID = -1;
+		
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+		try {
+			// STEP 2: Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			// STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			// STEP 4: Execute a query
+			
+			prepstmt = conn.prepareStatement("SELECT id FROM users WHERE userName=?");
+			prepstmt.setString(1, userName);
+			ResultSet rs = prepstmt.executeQuery();
+
+			// STEP 5: Extract data from result set
+			while (rs.next()) {
+				// Retrieve by column name
+				userID = rs.getInt("id");
+			}
+			// STEP 6: Clean-up environment
+			rs.close();
+			prepstmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (prepstmt != null)
+					prepstmt.close();
+			} catch (SQLException se2) {
+			} // nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} // end finally try
+		} // end try
+
+		return userID;
+	}
+	
+	public static User getUserInfo(String userName) {
+		User user = new User();
+		String phoneNumber = null;
+		String status = null;
+		String name = null;
+		//Get the profile picture from its table
+		//Add online status to the database
+		
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+		try {
+			// STEP 2: Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			// STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			// STEP 4: Execute a query
+			prepstmt = conn.prepareStatement("SELECT *, status.latestStatus FROM users LEFT JOIN status ON (users.id = status.status_userID) WHERE project1.users.userName=?");
+			prepstmt.setString(1, userName);
+			ResultSet rs = prepstmt.executeQuery();
+
+			// STEP 5: Extract data from result set
+			while (rs.next()) {
+				// Retrieve by column name
+				phoneNumber = rs.getString("phoneNumber");
+				status = rs.getString("latestStatus");
+				name = rs.getString("name");
+			}
+			user.setPhoneNumber(phoneNumber);
+			user.setName(name);
+			user.setStatus(status);
+			user.setUserName(userName);
+			// STEP 6: Clean-up environment
+			rs.close();
+			prepstmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (prepstmt != null)
+					prepstmt.close();
+			} catch (SQLException se2) {
+			} // nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} // end finally try
+		} // end try
+
+		return user;
 	}
 
 	public static String getRegisterationID(String userName) {
@@ -141,9 +346,9 @@ public class DBConnection {
 		return userName;
 	}
 
-	public static boolean insertUserIntoDB(String userName, String name, String phoneNumber, String deviceID,
+	public static String insertUserIntoDB(String userName, String name, String phoneNumber, String deviceID,
 			String regID) {
-		boolean canInsert = true;
+		String response = "success";
 
 		Connection conn = null;
 		PreparedStatement prepstmt = null;
@@ -154,6 +359,7 @@ public class DBConnection {
 			//STEP 3: Open a connection
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			
+			//Check for phone number
 			prepstmt = conn.prepareStatement("Select * from users WHERE phoneNumber=?");
 			prepstmt.setString(1, phoneNumber);
 
@@ -162,16 +368,26 @@ public class DBConnection {
 			while (rs.next()) {
 				if(rs.getString("phoneNumber")!=null)
 				{		
-					canInsert = false;
-				}
-				else
-				{
-					canInsert = true;
+					response = "phoneNumber already registered";
 				}
 			}
 			prepstmt.close();
 			
-			if(canInsert == true)
+			//Check for username
+			prepstmt = conn.prepareStatement("Select * from users WHERE userName=?");
+			prepstmt.setString(1, userName);
+
+			rs = prepstmt.executeQuery();
+
+			while (rs.next()) {
+				if(rs.getString("userName")!=null)
+				{		
+					response = "userName already registered";
+				}
+			}
+			prepstmt.close();
+			
+			if(response.equals("success"))
 			{
 				//STEP 4: Execute a query
 				prepstmt = conn.prepareStatement("INSERT INTO users VALUES (0, ?, ?, ?, ?, ?)");
@@ -208,7 +424,7 @@ public class DBConnection {
 				se.printStackTrace();
 			} // end finally try
 		} // end try
-		return canInsert;
+		return response;
 	}
 	
 	public static String getInfo(String deviceID) {
@@ -278,7 +494,6 @@ public class DBConnection {
 			//STEP 3: Open a connection
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			
-			
 			//STEP 4: Execute a query
 			prepstmt = conn.prepareStatement("INSERT INTO messagestemp VALUES (0, ?, ?, ?, ?, 0, ?)");
 			prepstmt.setString(1, senderUserName);
@@ -330,6 +545,7 @@ public class DBConnection {
 		
 		Connection conn = null;
 		Statement stmt = null;
+		
 		try {
 			// STEP 2: Register JDBC driver
 			Class.forName("com.mysql.jdbc.Driver");
@@ -446,5 +662,319 @@ public class DBConnection {
 				se.printStackTrace();
 			} // end finally try
 		} // end try
+	}
+
+	public static List<Contact> getRegisteredNumbers(List<String> receivedNumbers) {
+		
+		List<String> allNumbers = new ArrayList<String>();
+		List<Contact> allContacts = new ArrayList<>();
+		List<Contact> registeredContacts = new ArrayList<>();
+		Contact tempContact = new Contact();
+		String phoneNumber;
+		String userName;
+		String name;
+		int i;
+		int tempIndex;
+		int sizeOfReceivedList = receivedNumbers.size();
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+		try {
+			// STEP 2: Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+	
+			// STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			// STEP 4: Execute a query
+			
+			prepstmt = conn.prepareStatement("SELECT phoneNumber, userName, name FROM users");
+			ResultSet rs = prepstmt.executeQuery();
+	
+			// STEP 5: Extract data from result set
+			while (rs.next()) {
+				// Retrieve by column name
+				phoneNumber = rs.getString("phoneNumber");
+				userName = rs.getString("userName");
+				name = rs.getString("name");
+				allNumbers.add(phoneNumber);
+				tempContact = new Contact(phoneNumber, userName, name);
+				allContacts.add(tempContact);
+			}
+			for(i = 0; i < sizeOfReceivedList; i++){
+				phoneNumber = receivedNumbers.get(i);
+				if(allNumbers.contains(phoneNumber)){
+					tempIndex = allNumbers.indexOf(phoneNumber);
+					tempContact = new Contact();
+					tempContact = allContacts.get(tempIndex);
+					registeredContacts.add(tempContact);
+				}
+			}
+			// STEP 6: Clean-up environment
+			rs.close();
+			prepstmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (prepstmt != null)
+					prepstmt.close();
+			} catch (SQLException se2) {
+			} // nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} // end finally try
+		} // end try
+	
+		return registeredContacts;
+	}
+	
+	public static List<ServiceProvider> getNearbyServiceProviders(String serviceCategory, Double userLongitude, Double userLatitude)
+	{
+		List<ServiceProvider> allServiceProviders = new ArrayList<>();
+		List<ServiceProvider> nearbyServiceProviders = new ArrayList<>();
+		ServiceProvider tempServiceProvider = new ServiceProvider();
+		String phoneNumber;
+		String userName;
+		String name;
+		Double longitude;
+		Double latitude;
+		int rating;
+		String address;
+		int maxDistance = 5;
+		int distance = 1000;
+		int i;
+		
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+		try {
+			// STEP 2: Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+	
+			// STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			// STEP 4: Execute a query
+			
+			prepstmt = conn.prepareStatement("SELECT * FROM serviceproviders where serviceCategory=?");
+			prepstmt.setString(1, serviceCategory);
+			ResultSet rs = prepstmt.executeQuery();
+			
+			// STEP 5: Extract data from result set
+			while (rs.next()) {
+				// Retrieve by column name
+				phoneNumber = rs.getString("phoneNumber");
+				userName = rs.getString("userName");
+				name = rs.getString("name");
+				longitude = rs.getDouble("longitude");
+				latitude = rs.getDouble("latitude");
+				rating = rs.getInt("rating");
+				address = rs.getString("address");
+				tempServiceProvider = new ServiceProvider();
+				tempServiceProvider.setUserName(userName);
+				tempServiceProvider.setName(name);
+				tempServiceProvider.setPhoneNumber(phoneNumber);
+				tempServiceProvider.setLongitude(longitude);
+				tempServiceProvider.setLatitude(latitude);
+				tempServiceProvider.setRating(rating);
+				tempServiceProvider.setAddress(address);
+				tempServiceProvider.setServiceCategory(serviceCategory);
+				allServiceProviders.add(tempServiceProvider);
+			}
+			
+			for(i = 0; i< allServiceProviders.size(); i++){
+				tempServiceProvider = allServiceProviders.get(i);
+				distance = 1;
+				if(distance <= maxDistance){
+					nearbyServiceProviders.add(tempServiceProvider);
+				}
+			}
+			// STEP 6: Clean-up environment
+			rs.close();
+			prepstmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (prepstmt != null)
+					prepstmt.close();
+			} catch (SQLException se2) {
+			} // nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} // end finally try
+		} // end try
+	
+		return nearbyServiceProviders;
+	}
+	
+	public static void insertServiceProviderIntoDB(String name, String phoneNumber, String userName, Double latitude,
+			double longitude, String serviceCategory, String address) {
+
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+		try {
+			//STEP 2: Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			//STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+						
+			//STEP 4: Execute a query
+			prepstmt = conn.prepareStatement("INSERT INTO serviceproviders"
+					+ " (name, phoneNumber, userName, latitude, longitude, serviceCategory, address)"
+					+ " VALUES (?, ?, ?, ?, ?, ?, ?)"
+					+ " ON DUPLICATE KEY"
+					+ " UPDATE name=?, userName=?, latitude=?, longitude=?, serviceCategory=?, address=?");
+			prepstmt.setString(1, name);
+			prepstmt.setString(2, phoneNumber);
+			prepstmt.setString(3, userName);
+			prepstmt.setDouble(4, latitude);
+			prepstmt.setDouble(5, longitude);
+			prepstmt.setString(6, serviceCategory);
+			prepstmt.setString(7, address);
+			prepstmt.setString(8, name);
+			prepstmt.setString(9, userName);
+			prepstmt.setDouble(10, latitude);
+			prepstmt.setDouble(11, longitude);
+			prepstmt.setString(12, serviceCategory);
+			prepstmt.setString(13, address);
+			
+			prepstmt.executeUpdate();
+			prepstmt.close();
+
+			// STEP 6: Clean-up environment
+			conn.close();
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (prepstmt != null)
+					prepstmt.close();
+			} catch (SQLException se2) {
+			} // nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} // end finally try
+		} // end try
+	}
+	
+	public static Set<String> getAvailableServiceProviderCategories()
+	{
+		Set<String> categories = new HashSet<String>();
+		
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+
+		try {
+			// STEP 2: Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			// STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			
+			// STEP 4: Execute a query
+			prepstmt = conn.prepareStatement("SELECT * FROM serviceproviders");
+			ResultSet rs = prepstmt.executeQuery();
+			
+			// STEP 5: Extract data from result set
+			while (rs.next()) {
+				// Retrieve by column name
+				categories.add(rs.getString("serviceCategory"));
+			}
+			
+			// STEP 6: Clean-up environment
+			rs.close();
+			prepstmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (prepstmt != null)
+					prepstmt.close();
+			} catch (SQLException se2) {
+			} // nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} // end finally try
+		} // end try
+		return categories;
+	}
+	
+	public static void insertAnImage(String senderUserName, String recepientUserName, String recepientRegID, InputStream Image, String timestamp)
+	{
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+		try {
+			//STEP 2: Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+			//STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			prepstmt = conn.prepareStatement("INSERT INTO images VALUES (0, ?, ?, ?, ?, 0, ?)");
+			prepstmt.setString(1, senderUserName);
+			prepstmt.setString(2, recepientUserName);
+			prepstmt.setString(3, recepientRegID);
+			prepstmt.setAsciiStream(4, Image);
+			//prepstmt.setString(4, Image);
+			prepstmt.setString(5, timestamp);
+
+			prepstmt.executeUpdate();
+			prepstmt.close();
+
+			// STEP 6: Clean-up environment
+			conn.close();
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		}
+		catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (prepstmt != null)
+					prepstmt.close();
+			} catch (SQLException se2) {
+			} // nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} // end finally try
+		} 
 	}
 }

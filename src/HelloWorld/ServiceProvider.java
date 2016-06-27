@@ -1,0 +1,98 @@
+package HelloWorld;
+
+//This class is used to map the attributes of ServiceProviders objects, used when returning
+//a list of them to the user
+public class ServiceProvider{
+	
+	private String name;
+    private String phoneNumber;
+    private String userName;
+    private String serviceCategory;
+    private int rating;
+    private Double longitude;
+    private Double latitude;
+    private String address;
+	
+	public ServiceProvider()
+	{
+		this.name = null;
+        this.phoneNumber = null;
+        this.userName = null;
+        this.serviceCategory = null;
+        this.longitude = null;
+        this.latitude = null;
+	}
+	
+	public ServiceProvider(String name, String phoneNumber, String userName, Double longitude, Double latitude, String serviceCategory) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.userName = userName;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.serviceCategory = serviceCategory;
+    }
+	
+	public String getName(){
+        return this.name;
+    }
+    public String getPhoneNumber()
+    {
+        return this.phoneNumber;
+    }
+    public String getUserName()
+    {
+        return this.userName;
+    }
+    public Double getLongitude()
+    {
+        return this.longitude;
+    }
+    public Double getLatitude()
+    {
+        return this.latitude;
+    }
+    public String getServiceCategory()
+    {
+        return this.serviceCategory;
+    }
+    public int getRating()
+    {
+        return this.rating;
+    }
+    public String getAddress()
+    {
+        return this.address;
+    }
+	
+    public void setName(String name){
+        this.name = name;
+    }
+    public void setPhoneNumber(String phoneNumber)
+    {
+        this.phoneNumber = phoneNumber;
+    }
+    public void setUserName(String userName)
+    {
+        this.userName = userName;
+    }
+    public void setLongitude(Double longitude)
+    {
+        this.longitude = longitude;
+    }
+    public void setLatitude(Double latitude)
+    {
+        this.latitude = latitude;
+    }
+    public void setServiceCategory(String serviceCategory) {
+        this.serviceCategory = serviceCategory;
+    }
+    public void setRating(int rating)
+    {
+        this.rating = rating;
+    }
+    public void setAddress(String address)
+    {
+        this.address = address;
+    }
+
+}
