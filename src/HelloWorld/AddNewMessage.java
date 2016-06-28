@@ -76,7 +76,7 @@ public class AddNewMessage extends HttpServlet {
 		String recepientUserName = (String) messageJsonObject.get("recepientUserName");
 		String message = (String) messageJsonObject.get("messageContent");
 		String timestamp = (String) messageJsonObject.get("timestamp");
-		int messageID = (int) messageJsonObject.get("messageID");
+		int messageID = Integer.parseInt((String)messageJsonObject.get("messageID"));
 		System.out.println("Sender: " + senderDeviceID);
 		System.out.println("Recepient: " + recepientUserName);
 		System.out.println("MessageID: " + messageID);

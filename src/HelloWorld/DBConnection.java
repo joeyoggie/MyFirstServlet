@@ -14,7 +14,7 @@ public class DBConnection {
 
 	//JDBC driver name and database URL
 		static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-		static String DB_URL = "jdbc:mysql://localhost/project1";
+		static String DB_URL = "jdbc:mysql://localhost/project1?useSSL=false";
 	//Database credentials
 		static String USER = "Joey";
 		static String PASS = "abcd1234";

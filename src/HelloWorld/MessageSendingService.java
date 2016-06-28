@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 //This class is responsible for selecting unsent messages from the database
 //and then sends them to GCM if they should be sent
@@ -40,7 +41,8 @@ public class MessageSendingService extends Thread {
 			Message message = new Message();
 			Date dateOfMessage = new Date();
 			Date dateCurrent = new Date();
-			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-hh:mm:ss");
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-hh:mm:ss");
+			simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 			int messageTimeComparedToNow = 1;
 			messagesSelected = false;
 			int response;
