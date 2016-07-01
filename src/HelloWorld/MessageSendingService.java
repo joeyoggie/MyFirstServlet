@@ -21,8 +21,8 @@ public class MessageSendingService extends Thread {
     	boolean messagesSelected = false;
 
 		//Loop that will select unsent messages from DB and send them
-		while(MessageSendingServiceOnOff.enabled == true)
-		{			
+		while(MessageSendingServiceOnOff.enabled == true){			
+			
 			//TODO remove this delay
 			try {
 				Thread.sleep(1000);
