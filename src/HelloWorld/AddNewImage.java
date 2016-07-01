@@ -80,7 +80,7 @@ public class AddNewImage extends HttpServlet {
 	    String fileName = getSubmittedFileName(filePart);
 	    InputStream inputStream = filePart.getInputStream();
 	    
-		DBConnection.insertAnImage(senderUserName, recepientUserName, recepientRegID, inputStream, timestamp, fileName);
+		DBConnection.insertAnImage(senderUserName, recepientUserName, recepientRegID, timestamp, fileName, inputStream);
 
 		//File imageFile = null;
 	    //List<Byte> imageBinaryData = new ArrayList<>();

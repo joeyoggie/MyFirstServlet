@@ -936,7 +936,7 @@ public class DBConnection {
 
 	}
 
-	public static void insertAnImage(String senderUserName, String recepientUserName, String recepientRegID, InputStream image, String timestamp, String imageFileName)
+	public static void insertAnImage(String senderUserName, String recepientUserName, String recepientRegID, String timestamp, String imageFileName, InputStream image)
 	{
 
 		Connection conn = null;
@@ -948,13 +948,13 @@ public class DBConnection {
 			//STEP 3: Open a connection
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 
-			prepstmt = conn.prepareStatement("INSERT INTO images VALUES (0, ?, ?, ?, ?, 0, ?, ?)");
+			prepstmt = conn.prepareStatement("INSERT INTO images VALUES (0, ?, ?, ?, 0, ?, ?, ?)");
 			prepstmt.setString(1, senderUserName);
 			prepstmt.setString(2, recepientUserName);
 			prepstmt.setString(3, recepientRegID);
-			prepstmt.setBlob(4, image);
-			prepstmt.setString(5, timestamp);
-			prepstmt.setString(6, imageFileName);
+			prepstmt.setString(4, timestamp);
+			prepstmt.setString(5, imageFileName);
+			prepstmt.setBlob(6, image);
 
 			prepstmt.executeUpdate();
 			prepstmt.close();
