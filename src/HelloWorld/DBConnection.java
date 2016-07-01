@@ -1013,7 +1013,8 @@ public class DBConnection {
 					+ "senderUserName, "
 					+ "recepientUserName, "
 					+ "recepientRegID, "
-					+ "timestamp"
+					+ "timestamp,"
+					+ "state"
 					+ " FROM images WHERE state=0");
 
 			while (rs.next()) {
