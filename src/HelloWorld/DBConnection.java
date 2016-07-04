@@ -1,6 +1,9 @@
 package HelloWorld;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
@@ -1171,5 +1174,119 @@ public class DBConnection {
 			} 
 		}
 		return imageBlob ;
+	}
+	
+	public static Blob SelectImagebyUsername(String userName)
+	{
+		Blob imageBlob = null;
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+		//String y = "" ;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			//Class.forName("com.google.gson");
+
+			// STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			// STEP 4: Execute a query
+
+			prepstmt = conn.prepareStatement("SELECT image_itself FROM profilepicture_images WHERE AccountOwnerName=?");
+			prepstmt.setString(1, userName);
+			ResultSet rs = prepstmt.executeQuery();
+
+			rs.next();
+			imageBlob = rs.getBlob("image_itself");
+
+			rs.close();
+			prepstmt.close();
+			conn.close();
+		}
+		catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (prepstmt != null)
+					prepstmt.close();
+			} catch (SQLException se2) {
+			} // nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} 
+		}
+		return imageBlob ;
+	}
+	
+	public static void insertProfilePicture(String userName, InputStream image, String timestamp)
+	{
+
+		InputStream imageStream = image;
+		InputStream backupImageStream = null;
+		try {
+			ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream();
+			byte[] buffer = new byte[1024];
+			int len;
+			while((len = image.read(buffer)) > -1){
+				baOutputStream.write(buffer, 0, len);
+			}
+			byte[] ba = baOutputStream.toByteArray();
+			imageStream = new ByteArrayInputStream(ba);
+			backupImageStream = new ByteArrayInputStream(ba);
+			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		Connection conn = null;
+		PreparedStatement prepstmt = null;
+		try {
+			//STEP 2: Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			//STEP 3: Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			
+			prepstmt = conn.prepareStatement("INSERT INTO profilepicture_images "
+					+ "(AccountOwnerName, timestamp, image_itself) "
+					+ "VALUES (?, ?, ?) "
+					+ "ON DUPLICATE KEY UPDATE timestamp= ?, image_itself= ?");
+			prepstmt.setString(1, userName);
+			prepstmt.setString(2, timestamp);
+			prepstmt.setBlob(3, imageStream);
+			prepstmt.setString(4, timestamp);
+			prepstmt.setBlob(5, backupImageStream);
+
+			prepstmt.executeUpdate();
+			prepstmt.close();
+
+			// STEP 6: Clean-up environment
+			conn.close();
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		}
+		catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (prepstmt != null)
+					prepstmt.close();
+			} catch (SQLException se2) {
+			} // nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} // end finally try
+		} 
 	}
 }

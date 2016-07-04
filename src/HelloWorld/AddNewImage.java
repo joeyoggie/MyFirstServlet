@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,14 +68,16 @@ public class AddNewImage extends HttpServlet {
 		//doGet(request, response);
 	    System.out.println("Receiving image...");
 
-		String senderDeviceID = request.getParameter("senderDeviceID");
+	    String senderDeviceID = request.getParameter("senderDeviceID");
 		String recepientUserName = request.getParameter("recepientUserName");												
 		String timestamp = request.getParameter("timestamp");
+		String imageID = request.getParameter("imageID");
 		String senderUserName = DBConnection.getUserName(senderDeviceID);
 		String recepientRegID = DBConnection.getRegisterationID(recepientUserName);
-		System.out.println("sender:" + senderUserName);
-		System.out.println("recepient:" + recepientUserName);
-		System.out.println("timestamp" + timestamp);
+		System.out.println("sender: " + senderUserName);
+		System.out.println("recepient: " + recepientUserName);
+		System.out.println("timestamp: " + timestamp);
+		System.out.println("imageID: " + imageID);
 		
 		Part filePart = request.getPart("image_file");
 	    String fileName = getSubmittedFileName(filePart);
@@ -98,7 +101,9 @@ public class AddNewImage extends HttpServlet {
 		//fileOutputStream.flush();
 	    System.out.println("Image received...");
 	    
-
+	    PrintWriter out = response.getWriter();
+	    out.write(imageID);
+	    
 /*		try {
 			ServletFileUpload fileUpload = new ServletFileUpload();
 			FileItemIterator items = fileUpload.getItemIterator(request);
